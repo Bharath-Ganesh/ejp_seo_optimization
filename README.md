@@ -83,7 +83,26 @@ flowchart LR
 
 ```
 
-## Sequence Diagram: Guide Search Flow
+## Sequence Diagram: 1. Login & Role Retrieval
+```mermaid
+sequenceDiagram
+  participant U as User Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant US as user-service
+  participant DB as Database
+
+  U->>FE: POST /login {username,password}
+  FE->>API: POST /userservice/user/login
+  API->>US: authenticate(credentials)
+  US->>DB: verify username/password
+  DB-->>US: return user record with roles
+  US-->>API: return JWT (token + roles)
+  API-->>FE: return JWT
+  FE-->>U: store token and roles
+```
+
+## Sequence Diagram: 2. Public Guide Search
 ```mermaid
 sequenceDiagram
   participant U as User Browser
@@ -92,14 +111,58 @@ sequenceDiagram
   participant RS as resource-service
   participant DB as Database
 
-  U->>FE: Request `/library?q=housing`
-  FE->>API: Forward search query
-  API->>RS: Invoke `/resources/search?q=housing`
-  RS->>DB: Perform full-text query
-  DB-->>RS: Return matching guides
-  RS-->>API: Return JSON results
-  API-->>FE: Return JSON results
-  FE-->>U: Render HTML with results and metadata
+  U->>FE: GET /library?q=housing
+  FE->>API: GET /resources/search?q=housing
+  API->>RS: forward search query
+  RS->>DB: perform full-text search
+  DB-->>RS: return matching guides
+  RS-->>API: return JSON result
+  API-->>FE: return JSON result
+  FE-->>U: render guide list
+```
+
+
+## Sequence Diagram: 3. Protected Order Placement (USER role)
+```mermaid
+sequenceDiagram
+  participant U as User Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant OS as order-service
+  participant DB as Database
+
+  alt User has role=USER
+    U->>FE: POST /orders {guideId,...}
+    FE->>API: POST /orderservice/orders (Auth: Bearer JWT)
+    API->>OS: validate JWT & role USER
+    OS->>DB: insert order record
+    DB-->>OS: return new order ID
+    OS-->>API: return order confirmation
+    API-->>FE: return confirmation JSON
+    FE-->>U: display order success
+  end
+```
+
+
+## Sequence Diagram: 4. Admin Resource Management (ADMIN role)
+```mermaid
+sequenceDiagram
+  participant A as Admin Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant RS as resource-service
+  participant DB as Database
+
+  alt User has role=ADMIN
+    A->>FE: GET /admin/resources
+    FE->>API: GET /resources/admin (Auth: Bearer JWT)
+    API->>RS: validate JWT & role ADMIN
+    RS->>DB: fetch all guide metadata
+    DB-->>RS: return guide list
+    RS-->>API: return JSON list
+    API-->>FE: return JSON list
+    FE-->>A: render admin dashboard
+  end
 ```
 
 ## Module Details
