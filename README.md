@@ -83,10 +83,7 @@ flowchart LR
 
 ```
 
-## Sequence Diagram: Guide Search Flow
-```mermaid
 ## Sequence Diagram: Authentication, Authorization & Core Flows
-
 ```mermaid
 sequenceDiagram
   participant U as User Browser
@@ -141,7 +138,6 @@ sequenceDiagram
     API-->>FE: return JSON
     FE-->>A: render admin dashboard
   end
-
 ```
 
 ## Module Details
