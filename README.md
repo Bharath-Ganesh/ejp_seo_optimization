@@ -64,14 +64,14 @@ Run a MySQL container named `ejp-mysql` with root password `root` and database `
 ```mermaid
 flowchart LR
   subgraph Frontend
-    FE[SSR App (Nuxt 3 / Next.js)]
+    FE["SSR App"]
   end
   subgraph Backend
-    API[API Gateway]
-    US[user-service]
-    RS[resource-service]
-    OS[order-service]
-    DB[(Database)]
+    API["API Gateway"]
+    US["user-service"]
+    RS["resource-service"]
+    OS["order-service"]
+    DB["Database"]
   end
   FE --> API
   API --> US
@@ -80,6 +80,7 @@ flowchart LR
   US --> DB
   RS --> DB
   OS --> DB
+
 ```
 
 ## Sequence Diagram: Guide Search Flow
