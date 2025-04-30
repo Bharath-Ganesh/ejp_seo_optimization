@@ -1,0 +1,9 @@
+# Ignore build output and wrapper scripts globally
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
