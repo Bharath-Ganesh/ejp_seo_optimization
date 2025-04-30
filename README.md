@@ -1,69 +1,121 @@
 # Education Justice Project Interactive Reentry Guide Portal
 
 ## Overview
-The Education Justice Project (EJP) is creating a modern portal to replace static PDF “Reentry Guides” with a dynamic, searchable, map-driven experience. Users can easily find resources by keyword, state or topic, download guides directly, and explore a geographic view of available services. EJP staff gain a secure admin interface to add or update guides in real time—no redeploys required.
+The Education Justice Project (EJP) is replacing its static PDF “Reentry Guides” with a dynamic, SEO-first portal. Visitors will enjoy full-text search, filter facets and an interactive map, while EJP staff use a secure admin interface to manage guides in real time—no code changes or redeploys needed.
+
+---
+
+## Context & Goal
+On [educationjustice.net](https://educationjustice.net/) the **Reentry Guides** section is a simple dropdown of static PDFs:
+- Mapping Your Future: 2025 Edition
+- Mapping Your Future: National Edition
+- A New Path: A Guide to the Challenges and Opportunities After Deportation
+
+We will transform each guide into a dedicated, server-rendered page (e.g. `/library/mapping-your-future-2025`) with rich meta tags and structured data, combined with full-text search and an interactive map to make resources instantly accessible to users and easily discoverable by search engines.
+
+---
 
 ## Project Vision & Goals
-- Empower returning citizens, families and service providers with intuitive search and filtering  
-- Maximize organic reach through server-side rendering, dynamic meta tags, structured data and an auto-generated sitemap  
-- Streamline guide management via a role-based admin UI, removing the need for code changes or manual deployments  
-- Demonstrate a modular microservices architecture paired with a cutting-edge SSR frontend  
+- **Empower Users** with intuitive search, filtering and map-based discovery
+- **Optimize for Discovery** through server-side rendering, dynamic meta tags, JSON-LD and an auto-generated sitemap
+- **Streamline Management** via a role-based admin UI for real-time guide CRUD operations
+- **Modern Architecture** using independent Java/Spring Boot microservices and an SSR frontend (Nuxt 3 or Next.js)
+
+---
 
 ## Quick Start
-1. **Clone & Navigate**  
-   – Repository: https://github.com/Bharath-Ganesh/ejp_seo_optimization  
-2. **Build & Run Services**  
-   – **user-service** (port 8001)  
-   – **resource-service** (port 8002)  
-   – **order-service** (port 8003, optional)  
-3. **Launch Frontend**  
-   – **frontend** application (default port 3000)  
+1. Clone the repository and navigate into it.
+2. Build and start each microservice (user-service on port 8001, resource-service on 8002, order-service on 8003).
+3. Launch the frontend application (default port 3000).
+
+---
 
 ## Database Setup
-- **MySQL**  
-  • Create a database named `parcel_xyz`  
-- **Docker**  
-  • Run a MySQL container with:  
-    – root password = `root`  
-    – database = `parcel_xyz`  
-    – port mapping 3306 → 3306  
+**MySQL**  
+Create a database named `parcel_xyz`.  
+**Docker**  
+Run a MySQL container named `ejp-mysql` with root password `root` and database `parcel_xyz`, exposing port 3306.
 
-## Module Details
-- **user-service/**  
-  Manages user registration, JWT-based login, profile retrieval, full-text search, and status toggling.  
-- **resource-service/**  
-  Handles Reentry Guide metadata: create/read/update/delete operations, slug lookup, full-text search indexing and queries.  
-- **order-service/** (optional)  
-  Illustrates order placement and status workflows for delivery agents.  
-- **frontend/**  
-  SSR application featuring:  
-  - `/library` — searchable guide list  
-  - `/library/[slug]` — SEO-optimized guide detail pages  
-  - `/map` — interactive Leaflet map of guide locations  
-  - `/admin` — secure CRUD interface for EJP staff  
+---
 
-## API Documentation
-- **user-service**  
-  • Swagger UI: http://localhost:8001/userservice/swagger-ui.html  
-  • OpenAPI JSON: http://localhost:8001/userservice/v2/api-docs  
-- **resource-service**  
-  • Swagger UI: http://localhost:8002/resources/swagger-ui.html  
-  • OpenAPI JSON: http://localhost:8002/resources/v2/api-docs  
-- **order-service**  
-  • Swagger UI: http://localhost:8003/orders/swagger-ui.html  
-  • OpenAPI JSON: http://localhost:8003/orders/v2/api-docs  
+## Detailed Plan
+1. **Backend Modules**
+    - Scaffold `user-service`, `resource-service` and `order-service`; define entities, repositories, services and controllers; configure Swagger.
+2. **Full-Text Search**
+    - Add a documented search vector and database index; implement `/resources/search?q=` endpoint.
+3. **Authentication & Security**
+    - Integrate Spring Security + JWT; protect admin endpoints by role.
+4. **SSR Frontend Setup**
+    - Initialize Nuxt 3 or Next.js; add sitemap, robots.txt, dynamic `<head>`, and authentication modules.
+5. **Library & Detail Pages**
+    - Build `/library` (server-rendered list with client filtering) and `/library/[slug]` (SSR detail pages with dynamic titles, meta descriptions and JSON-LD).
+6. **Map Integration**
+    - Integrate Leaflet.js to render guide locations as interactive markers with download links.
+7. **Admin Interface**
+    - Secure `/admin` routes; implement CRUD forms for guide metadata and file uploads.
+8. **SEO & Deployment**
+    - Generate `sitemap.xml` and `robots.txt`; perform SEO, performance and accessibility audits; deploy backend and frontend.
 
-## Next Steps
-- Define and implement the resource-service data model with full-text indexing  
-- Integrate JWT-based security across all services and protect admin frontend routes  
-- Complete SSR frontend pages, wire up API calls, enable dynamic meta tags and sitemap generation  
-- Deploy to staging, run SEO and accessibility audits, then promote to production  
+---
 
-## Contributing
-1. Fork the repository  
-2. Create a feature branch (`feature/your-feature`)  
-3. Commit your changes with clear messages  
-4. Open a Pull Request for review  
+## Architecture & UML Diagrams
 
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.  
+### Component Diagram
+```mermaid
+flowchart LR
+  subgraph Frontend
+    FE[SSR App (Nuxt 3 / Next.js)]
+  end
+  subgraph Backend
+    API[API Gateway]
+    US[user-service]
+    RS[resource-service]
+    OS[order-service]
+    DB[(Database)]
+  end
+  FE --> API
+  API --> US
+  API --> RS
+  API --> OS
+  US --> DB
+  RS --> DB
+  OS --> DB
+
+## Sequence Diagram: Guide Search Flow
+sequenceDiagram
+  participant U as User Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant RS as resource-service
+  participant DB as Database
+
+  U->>FE: Request `/library?q=housing`
+  FE->>API: Forward search query
+  API->>RS: Invoke `/resources/search?q=housing`
+  RS->>DB: Perform full-text query
+  DB-->>RS: Return matching guides
+  RS-->>API: Return JSON results
+  API-->>FE: Return JSON results
+  FE-->>U: Render HTML with results and metadata
+
+
+Module Details
+user-service/
+Manages user registration, JWT login, profile retrieval, full-text search and role-based status toggling.
+
+resource-service/
+Handles guide metadata CRUD, slug lookup and full-text search indexing and queries.
+
+order-service/ (optional)
+Demonstrates order placement, status updates and agent assignments.
+
+frontend/
+SSR application featuring:
+
+/library — searchable guide list
+
+/library/[slug] — SEO-optimized guide detail pages
+
+/map — interactive guide map
+
+/admin — role-protected CRUD interface
