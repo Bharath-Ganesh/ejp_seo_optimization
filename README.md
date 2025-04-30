@@ -83,59 +83,84 @@ flowchart LR
 
 ```
 
-## Sequence Diagram: Authentication, Authorization & Core Flows
+## Sequence Diagram: 1. Login & Role Retrieval
 ```mermaid
 sequenceDiagram
   participant U as User Browser
   participant FE as Frontend SSR
   participant API as API Gateway
   participant US as user-service
-  participant RS as resource-service
-  participant OS as order-service
   participant DB as Database
 
-  %% 1. Login & Role Retrieval
   U->>FE: POST /login {username,password}
   FE->>API: POST /userservice/user/login
   API->>US: authenticate(credentials)
   US->>DB: verify username/password
-  DB-->>US: user record with roles
-  US-->>API: JWT(token + roles)
+  DB-->>US: return user record with roles
+  US-->>API: return JWT (token + roles)
   API-->>FE: return JWT
   FE-->>U: store token and roles
+```
 
-  %% 2. Public Guide Search
+## Sequence Diagram: 2. Public Guide Search
+```mermaid
+sequenceDiagram
+  participant U as User Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant RS as resource-service
+  participant DB as Database
+
   U->>FE: GET /library?q=housing
   FE->>API: GET /resources/search?q=housing
   API->>RS: forward search query
-  RS->>DB: full-text search
-  DB-->>RS: matching guides
-  RS-->>API: return JSON
-  API-->>FE: return JSON
+  RS->>DB: perform full-text search
+  DB-->>RS: return matching guides
+  RS-->>API: return JSON result
+  API-->>FE: return JSON result
   FE-->>U: render guide list
+```
 
-  %% 3. Protected Order Placement (USER role)
-  alt User with role=USER
+
+## Sequence Diagram: 3. Protected Order Placement (USER role)
+```mermaid
+sequenceDiagram
+  participant U as User Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant OS as order-service
+  participant DB as Database
+
+  alt User has role=USER
     U->>FE: POST /orders {guideId,...}
     FE->>API: POST /orderservice/orders (Auth: Bearer JWT)
-    API->>OS: validate JWT & role USER  
-    OS->>DB: insert order
-    DB-->>OS: new order ID
+    API->>OS: validate JWT & role USER
+    OS->>DB: insert order record
+    DB-->>OS: return new order ID
     OS-->>API: return order confirmation
-    API-->>FE: return JSON
+    API-->>FE: return confirmation JSON
     FE-->>U: display order success
   end
+```
 
-  %% 4. Admin Resource Management (ADMIN role)
-  alt User with role=ADMIN
-    A as Admin Browser
+
+## Sequence Diagram: 4. Admin Resource Management (ADMIN role)
+```mermaid
+sequenceDiagram
+  participant A as Admin Browser
+  participant FE as Frontend SSR
+  participant API as API Gateway
+  participant RS as resource-service
+  participant DB as Database
+
+  alt User has role=ADMIN
     A->>FE: GET /admin/resources
     FE->>API: GET /resources/admin (Auth: Bearer JWT)
     API->>RS: validate JWT & role ADMIN
-    RS->>DB: fetch all guides
-    DB-->>RS: guide list
-    RS-->>API: return JSON
-    API-->>FE: return JSON
+    RS->>DB: fetch all guide metadata
+    DB-->>RS: return guide list
+    RS-->>API: return JSON list
+    API-->>FE: return JSON list
     FE-->>A: render admin dashboard
   end
 ```
