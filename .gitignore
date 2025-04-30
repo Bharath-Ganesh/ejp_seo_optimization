@@ -1,9 +1,54 @@
-# Ignore build output and wrapper scripts globally
+# ==== Maven / Java ====
+
+# Maven build output
 **/target/
+
+# Maven wrapper scripts and directory
 **/.mvn/
 **/mvnw
 **/mvnw.cmd
-**/target/
-**/.mvn/
-**/mvnw
-**/mvnw.cmd
+
+# Eclipse/STS
+.project
+.classpath
+.settings/
+.apt_generated/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+
+# ==== Node / Next.js Frontend ====
+
+# Dependencies
+/frontend/node_modules/
+
+# Next.js build output
+/frontend/.next/
+/frontend/out/
+
+# Env files
+/frontend/.env*
+/*.env*
+
+# ==== Logs & Misc ====
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+**/jacoco.exec
+
+# Temporary files
+*.tmp
+*.swp
