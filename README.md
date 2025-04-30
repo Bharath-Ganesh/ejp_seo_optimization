@@ -80,8 +80,10 @@ flowchart LR
   US --> DB
   RS --> DB
   OS --> DB
+```
 
 ## Sequence Diagram: Guide Search Flow
+```mermaid
 sequenceDiagram
   participant U as User Browser
   participant FE as Frontend SSR
@@ -97,25 +99,21 @@ sequenceDiagram
   RS-->>API: Return JSON results
   API-->>FE: Return JSON results
   FE-->>U: Render HTML with results and metadata
+```
 
+## Module Details
+- **user-service/**  
+  Provides user account management, including registration and JWT-based authentication, profile retrieval and updates, full-text user search, and role/status management.
 
-Module Details
-user-service/
-Manages user registration, JWT login, profile retrieval, full-text search and role-based status toggling.
+- **resource-service/**  
+  Manages Reentry Guide metadata with full CRUD support, slug-based lookup for clean URLs, and high-performance full-text search indexing and querying.
 
-resource-service/
-Handles guide metadata CRUD, slug lookup and full-text search indexing and queries.
+- **order-service/** (optional)  
+  Handles delivery order workflows: order creation, status tracking, and assignment of orders to delivery agents.
 
-order-service/ (optional)
-Demonstrates order placement, status updates and agent assignments.
-
-frontend/
-SSR application featuring:
-
-/library — searchable guide list
-
-/library/[slug] — SEO-optimized guide detail pages
-
-/map — interactive guide map
-
-/admin — role-protected CRUD interface
+- **frontend/**  
+  A server-side rendered (SSR) application featuring:
+    - **`/library`** — a paginated, filterable list of guides with keyword and facet search
+    - **`/library/[slug]`** — individual guide pages with optimized SEO metadata and rich snippets
+    - **`/map`** — an interactive map view plotting guide locations with downloadable links
+    - **`/admin`** — a secure, role-protected interface for EJP staff to create, update, and remove guides  
